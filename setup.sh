@@ -152,6 +152,14 @@ else
   echo -e "${CHECK_ICON} Copied .prettierrc"
 fi
 
+# Copy stylint config
+if [ -f ".stylintrc.json" ]; then
+  echo -e "${INFO_ICON} .stylintrc.json already exists. Skipping copy."
+else
+  cp "$SCRIPT_DIR/.stylintrc.json" .
+  echo -e "${CHECK_ICON} Copied .stylintrc.json"
+fi
+
 # Copy pre-commit-config.yaml
 if [ -f ".pre-commit-config.yaml" ]; then
   echo -e "${INFO_ICON} .pre-commit-config.yaml already exists. Skipping copy."
@@ -162,16 +170,28 @@ fi
 
 # Install dependencies
 echo ""
-run_with_spinner "Installing devDependencies (this may take a while)" "npm install --save-dev stylelint stylelint-config-recommended stylelint-config-standard stylelint-plugin-stylus stylelint-config-html postcss-html postcss-markdown prettier"
+run_with_spinner "Installing devDependencies (this may take a while)" "npm install --save-dev stylelint stylelint-config-recommended stylelint-config-standard stylelint-plugin-stylus stylelint-config-html postcss-html postcss-markdown prettier autoprefixer-stylus stylus stylus-loader"
 
 # Add scripts to package.json
 if [ -f "package.json" ]; then
   echo -e "${ARROW_ICON} Adding scripts to package.json..."
+  npm pkg set scripts.build="node scripts/build.js"
+  npm pkg set scripts.watch="stylus -u autoprefixer-stylus src/main.styl -o dist/main.css --watch"
   npm pkg set scripts.lint="stylelint \"src/**/*.styl\" \"**/*.html\" \"**/*.vue\" \"**/*.svelte\" \"**/*.astro\" \"**/*.php\" \"**/*.md\""
   npm pkg set scripts.format="prettier --write \"src/**/*.{styl,js,json}\" && stylelint --fix \"src/**/*.styl\" \"**/*.html\" \"**/*.vue\" \"**/*.svelte\" \"**/*.astro\" \"**/*.php\" \"**/*.md\""
   echo -e "${CHECK_ICON} Scripts added."
 else
   echo -e "${RED}No package.json found. Skipping scripts addition.${NC}"
+fi
+
+# Copy scripts directory
+if [ -d "$SCRIPT_DIR/scripts" ]; then
+  if [ ! -d "scripts" ]; then
+    cp -r "$SCRIPT_DIR/scripts" .
+    echo -e "${CHECK_ICON} Copied scripts directory"
+  else
+    echo -e "${INFO_ICON} scripts directory already exists. Skipping copy."
+  fi
 fi
 
 echo -e "\n${GREEN}${BOLD}Stylelint setup complete!${NC} 🚀"
