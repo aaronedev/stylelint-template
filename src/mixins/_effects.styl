@@ -1,0 +1,10 @@
+// Effect mixins for consistent animations and shadows
+hover-lift($offset = -2px, $shadow = 0 6px 24px rgba(0, 0, 0, 0.45))
+  &:hover
+    transform translateY($offset)
+    box-shadow $shadow
+
+focus-ring($color = $primary)
+  &:focus-visible
+    outline 2px solid $color
+    outline-offset 2px

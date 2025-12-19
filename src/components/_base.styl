@@ -1,0 +1,21 @@
+@import '../variables/_colors'
+@import '../mixins/_effects'
+
+// Base styles and CSS custom properties
+:root
+  --darker $darker
+  --dark $dark
+  --base $base
+  --light $light
+  --lighter $lighter
+  --primary $primary
+  --secondary $secondary
+
+body
+  background-color $base
+  color $light
+  -webkit-font-smoothing antialiased
+  line-height 1.6
+
+*
+  focus-ring()

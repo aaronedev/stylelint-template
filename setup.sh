@@ -194,4 +194,14 @@ if [ -d "$SCRIPT_DIR/scripts" ]; then
   fi
 fi
 
+# Copy src directory (scaffold)
+if [ -d "$SCRIPT_DIR/src" ]; then
+  if [ ! -d "src" ]; then
+    cp -r "$SCRIPT_DIR/src" .
+    echo -e "${CHECK_ICON} Copied src directory (scaffold)"
+  else
+    echo -e "${INFO_ICON} src directory already exists. Skipping scaffold copy."
+  fi
+fi
+
 echo -e "\n${GREEN}${BOLD}Stylelint setup complete!${NC} 🚀"
