@@ -2,29 +2,67 @@ const fs = require('fs')
 const path = require('path')
 const stylus = require('stylus')
 const autoprefixer = require('autoprefixer-stylus')
-const pkg = require('../package.json')
 
 const inputFile = path.join(__dirname, '../src/main.styl')
 const outputFile = path.join(__dirname, '../dist/main.css')
 const distDir = path.dirname(outputFile)
 const pkgFile = path.join(__dirname, '../package.json')
 
-// Bump version
-const now = new Date()
 const pad = (n) => n.toString().padStart(2, '0')
-const version = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}.${pad(now.getHours())}.${pad(now.getMinutes())}`
+const getTimestampVersion = () => {
+  const now = new Date()
+  return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}.${pad(now.getHours())}.${pad(now.getMinutes())}`
+}
 
-// Only update version if userStyle object exists, otherwise just log or init it
-if (!pkg.userStyle) {
-  pkg.userStyle = {
-    namespace: 'github.com/your-username/your-theme',
-    version: version,
+const loadPackageJson = () => {
+  if (!fs.existsSync(pkgFile)) {
+    const fallbackName = path.basename(path.resolve(__dirname, '..'))
+    console.warn(`No package.json found. Creating a minimal package.json for ${fallbackName}.`)
+    return {
+      name: fallbackName,
+      description: '',
+      author: '',
+      license: 'UNLICENSED',
+      userStyle: {
+        namespace: 'github.com/your-username/your-theme',
+      },
+    }
   }
-} else {
+
+  try {
+    const raw = fs.readFileSync(pkgFile, 'utf8')
+    return JSON.parse(raw)
+  } catch (error) {
+    console.error(`Error reading package.json: ${error.message}`)
+    process.exit(1)
+  }
+}
+
+const savePackageJson = (pkg) => {
+  fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + '\n')
+}
+
+const bumpUserStyleVersion = (pkg, version) => {
+  if (!pkg.userStyle) {
+    pkg.userStyle = {
+      namespace: 'github.com/your-username/your-theme',
+      version: version,
+    }
+    return
+  }
+
+  if (!pkg.userStyle.namespace) {
+    pkg.userStyle.namespace = 'github.com/your-username/your-theme'
+  }
+
   pkg.userStyle.version = version
 }
 
-fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + '\n')
+const pkg = loadPackageJson()
+const version = getTimestampVersion()
+
+bumpUserStyleVersion(pkg, version)
+savePackageJson(pkg)
 console.log(`Bumped version to ${version}`)
 
 // Create dist dir if not exists
