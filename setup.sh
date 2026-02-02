@@ -170,15 +170,16 @@ fi
 
 # Install dependencies
 echo ""
-run_with_spinner "Installing devDependencies (this may take a while)" "npm install --save-dev stylelint stylelint-config-recommended stylelint-config-standard stylelint-plugin-stylus stylelint-config-html postcss-html postcss-markdown prettier autoprefixer-stylus stylus stylus-loader"
+run_with_spinner "Installing devDependencies (this may take a while)" "npm install --save-dev stylelint stylelint-config-recommended stylelint-config-standard stylelint-plugin-stylus prettier autoprefixer-stylus stylus stylus-loader"
 
 # Add scripts to package.json
 if [ -f "package.json" ]; then
   echo -e "${ARROW_ICON} Adding scripts to package.json..."
   npm pkg set scripts.build="node scripts/build.js"
   npm pkg set scripts.watch="stylus -u autoprefixer-stylus src/main.styl -o dist/main.css --watch"
-  npm pkg set scripts.lint="stylelint \"src/**/*.styl\" \"**/*.html\" \"**/*.vue\" \"**/*.svelte\" \"**/*.astro\" \"**/*.php\" \"**/*.md\""
-  npm pkg set scripts.format="prettier --write \"src/**/*.{styl,js,json}\" && stylelint --fix \"src/**/*.styl\" \"**/*.html\" \"**/*.vue\" \"**/*.svelte\" \"**/*.astro\" \"**/*.php\" \"**/*.md\""
+  npm pkg set scripts.lint="stylelint \"src/**/*.styl\""
+  npm pkg set scripts.lint:fix="stylelint \"src/**/*.styl\" --fix"
+  npm pkg set scripts.format="prettier --write \"**/*.{js,json}\" && stylelint --fix \"src/**/*.styl\""
   echo -e "${CHECK_ICON} Scripts added."
 else
   echo -e "${RED}No package.json found. Skipping scripts addition.${NC}"
